@@ -60,10 +60,10 @@ class Settings:
     MIN_ARTICLE_WORDS = int(os.getenv('MIN_ARTICLE_WORDS') or '800')
     MAX_ARTICLE_WORDS = int(os.getenv('MAX_ARTICLE_WORDS') or '1500')
     
-    # AI Model Settings
+    # AI Model Settings (Updated models)
     PRIMARY_AI = 'groq' if GROQ_API_KEY else 'gemini'
-    GROQ_MODEL = 'llama3-70b-8192'  # Free Groq model
-    GEMINI_MODEL = 'gemini-1.5-flash'  # Free Gemini model
+    GROQ_MODEL = 'llama-3.1-70b-versatile'  # Updated Groq model
+    GEMINI_MODEL = 'gemini-1.5-flash-latest'  # Updated Gemini model
     
     # TTS Settings
     TTS_VOICE = 'en-US-AriaNeural'  # Microsoft Edge TTS voice
