@@ -10,6 +10,13 @@ from utils.logger import setup_logger
 from utils.image_downloader import ImageDownloader
 from utils.music_manager import MusicManager
 
+# Set ImageMagick binary path for MoviePy text overlays
+# This must be set BEFORE importing TextClip from moviepy
+if os.name == 'posix':  # Linux/Mac
+    os.environ['IMAGEMAGICK_BINARY'] = os.environ.get('IMAGEMAGICK_BINARY', '/usr/bin/convert')
+elif os.name == 'nt':  # Windows
+    os.environ['IMAGEMAGICK_BINARY'] = os.environ.get('IMAGEMAGICK_BINARY', 'convert')
+
 logger = setup_logger(__name__)
 
 
