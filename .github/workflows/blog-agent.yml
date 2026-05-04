@@ -41,26 +41,32 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       
-      # Step 3: Install Python dependencies
+      # Step 3: Install System Dependencies (ImageMagick for video text overlays)
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          python -m pip install --upgrade pip
+      
+      # Step 4: Install Python dependencies
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
         timeout-minutes: 5
       
-      # Step 4: Configure Git for committing database changes
+      # Step 5: Configure Git for committing database changes
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
       
-      # Step 5: Pull latest database (in case other runs updated it)
+      # Step 6: Pull latest database (in case other runs updated it)
       - name: Pull Latest Database
         run: |
           git pull origin main || echo "No changes to pull"
         continue-on-error: true
       
-      # Step 6: Run the Blog AI Agent
+      # Step 7: Run the Blog AI Agent
       - name: Run Blog AI Agent
         env:
           # AI API Keys
@@ -114,7 +120,7 @@ jobs:
           python main.py
         timeout-minutes: 12
       
-      # Step 7: Commit and push database changes (if any)
+      # Step 8: Commit and push database changes (if any)
       - name: Commit Database Changes
         run: |
           git add database/blog_agent.db || echo "No database file"
@@ -122,7 +128,7 @@ jobs:
         continue-on-error: true
         if: always()
       
-      # Step 8: Upload logs as artifact (for debugging)
+      # Step 9: Upload logs as artifact (for debugging)
       - name: Upload Logs
         if: always()
         uses: actions/upload-artifact@v4

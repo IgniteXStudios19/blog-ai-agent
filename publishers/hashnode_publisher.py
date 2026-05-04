@@ -44,7 +44,11 @@ class HashnodePublisher:
         for tag in tags[:5]:  # Max 5 tags
             tag_slug = self._slugify_tag(tag)
             if tag_slug:
-                tag_slugs.append({'slug': tag_slug})
+                # Hashnode requires both slug and name for tag input
+                tag_slugs.append({
+                    'slug': tag_slug,
+                    'name': tag  # Original tag name (not slugified)
+                })
         
         # GraphQL mutation for creating a post (simplified - only valid fields)
         mutation = """

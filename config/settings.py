@@ -34,7 +34,7 @@ class Settings:
     
     # Social Media Platforms
     TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
-    TELEGRAM_CHANNEL_ID = os.getenv('TELEGRAM_CHANNEL_ID', '')
+    TELEGRAM_CHANNEL_ID = os.getenv('TELEGRAM_CHANNEL_ID', '').strip()  # Remove whitespace/newlines
     
     TWITTER_API_KEY = os.getenv('TWITTER_API_KEY', '')
     TWITTER_API_SECRET = os.getenv('TWITTER_API_SECRET', '')
