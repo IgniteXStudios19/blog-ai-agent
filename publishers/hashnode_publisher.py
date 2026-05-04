@@ -16,7 +16,7 @@ class HashnodePublisher:
     
     def __init__(self):
         self.api_key = settings.HASHNODE_API_KEY
-        self.publication_id = settings.HASHNODE_PUBLICATION_ID
+        self.publication_id = settings.HASHNODE_PUBLICATION_ID.strip()  # Remove newlines/spaces
         self.api_url = 'https://gql.hashnode.com'
         
         if not self.api_key:
@@ -37,7 +37,6 @@ class HashnodePublisher:
         title = blog_data['title']
         content = blog_data['content']
         tags = blog_data.get('tags', [])
-        meta_description = blog_data.get('meta_description', '')
         slug = blog_data.get('slug', '')
         
         # Convert tags to Hashnode format
@@ -47,7 +46,7 @@ class HashnodePublisher:
             if tag_slug:
                 tag_slugs.append({'slug': tag_slug})
         
-        # GraphQL mutation for creating a post
+        # GraphQL mutation for creating a post (simplified - only valid fields)
         mutation = """
         mutation PublishPost($input: PublishPostInput!) {
             publishPost(input: $input) {
@@ -61,19 +60,13 @@ class HashnodePublisher:
         }
         """
         
-        # Prepare input variables
+        # Prepare input variables (only valid fields)
         variables = {
             'input': {
                 'title': title,
                 'contentMarkdown': content,
                 'tags': tag_slugs,
-                'coverImageURL': blog_data.get('cover_image', ''),
-                'brief': meta_description,
-                'publicationId': self.publication_id,
-                'hideFromFeed': False,
-                'isRepublished': {
-                    'originalArticleURL': ''
-                }
+                'publicationId': self.publication_id,  # Clean ID without newlines
             }
         }
         
@@ -101,94 +94,37 @@ class HashnodePublisher:
             )
             
             if response.status_code == 200:
-                data = response.json()
+                result = response.json()
                 
-                if 'errors' in data:
-                    logger.error(f"Hashnode API errors: {data['errors']}")
+                # Check for errors
+                if 'errors' in result:
+                    logger.error(f"Hashnode API errors: {result['errors']}")
                     return None
                 
-                post_data = data.get('data', {}).get('publishPost', {}).get('post', {})
+                # Get the published post URL
+                post_data = result.get('data', {}).get('publishPost', {}).get('post', {})
+                post_url = post_data.get('url')
                 
-                if post_data:
-                    post_url = post_data.get('url', '')
-                    logger.info(f"Successfully published to Hashnode: {post_url}")
+                if post_url:
+                    logger.info(f"Published to Hashnode: {post_url}")
                     return post_url
                 else:
-                    logger.error("No post data in response")
+                    logger.error("Hashnode publish succeeded but no URL returned")
                     return None
             else:
                 logger.error(f"Hashnode API error: {response.status_code} - {response.text}")
                 return None
                 
         except Exception as e:
-            logger.error(f"Failed to publish to Hashnode: {str(e)}")
-            return None
-    
-    def update_post(self, post_id, blog_data):
-        """Update an existing post (if needed)"""
-        logger.info(f"Updating Hashnode post: {post_id}")
-        
-        # Similar to publish but with update mutation
-        # Implementation depends on Hashnode's API for updates
-        pass
-    
-    def get_publication_info(self):
-        """Get information about the publication"""
-        query = """
-        query GetPublication($host: String!) {
-            publication(host: $host) {
-                id
-                title
-                url
-                posts(first: 5) {
-                    edges {
-                        node {
-                            title
-                            slug
-                            url
-                        }
-                    }
-                }
-            }
-        }
-        """
-        
-        variables = {'host': 'your-hashnode-host'}  # e.g., 'yourblog.hashnode.dev'
-        
-        headers = {
-            'Authorization': self.api_key,
-            'Content-Type': 'application/json'
-        }
-        
-        payload = {
-            'query': query,
-            'variables': variables
-        }
-        
-        try:
-            response = requests.post(
-                self.api_url,
-                headers=headers,
-                json=payload,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                return response.json()
-            else:
-                logger.error(f"Failed to get publication info: {response.status_code}")
-                return None
-                
-        except Exception as e:
-            logger.error(f"Error getting publication info: {str(e)}")
+            logger.error(f"Hashnode publish failed: {str(e)}")
             return None
     
     def _slugify_tag(self, tag):
-        """Convert tag to slug format"""
+        """Convert tag to URL-friendly slug"""
         if not tag:
             return ''
-        
-        # Simple slugify for tags
+        # Simple slugify: lowercase, replace spaces with hyphens
         slug = tag.lower().replace(' ', '-').replace('_', '-')
+        # Remove special characters
         slug = ''.join(c for c in slug if c.isalnum() or c == '-')
         return slug[:50]  # Limit length
