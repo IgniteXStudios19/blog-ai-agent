@@ -16,7 +16,7 @@ gtts==2.5.1                 # Google Text-to-Speech (backup)
 
 # Video Generation
 moviepy==1.0.3              # Video creation from images/audio
-Pillow==10.1.0              # Image processing and text overlays
+Pillow==9.5.0               # Image processing (9.x has Image.ANTIALIAS)
 opencv-python==4.8.1.78     # Video frame processing
 
 # Social Media APIs
