@@ -5,6 +5,7 @@ Supports Groq (primary) and Gemini (fallback) - both completely free
 
 import json
 import re
+import time
 from config.settings import settings
 from config.prompts import PromptTemplates
 from utils.logger import setup_logger
@@ -335,21 +336,33 @@ class ContentWriter:
         )
         return self._call_ai(prompt, max_tokens=600)
     
-    def _call_ai(self, prompt, max_tokens=2000):
-        """Call AI model with fallback logic"""
+    def _call_ai(self, prompt, max_tokens=2000, retry_count=3):
+        """Call AI model with fallback logic and rate limit handling"""
         
-        # Try primary (Groq) first
+        # Try primary (Groq) first with retry logic
         if self.primary_client:
-            try:
-                response = self.primary_client.chat.completions.create(
-                    model=settings.GROQ_MODEL,
-                    messages=[{"role": "user", "content": prompt}],
-                    max_tokens=max_tokens,
-                    temperature=0.7
-                )
-                return response.choices[0].message.content
-            except Exception as e:
-                logger.warning(f"Groq API failed: {str(e)}, trying fallback...")
+            for attempt in range(retry_count):
+                try:
+                    response = self.primary_client.chat.completions.create(
+                        model=settings.GROQ_MODEL,
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=max_tokens,
+                        temperature=0.7
+                    )
+                    return response.choices[0].message.content
+                except Exception as e:
+                    error_msg = str(e).lower()
+                    
+                    # Check if it's a rate limit error
+                    if 'rate limit' in error_msg or '429' in error_msg or 'tp' in error_msg:
+                        if attempt < retry_count - 1:
+                            wait_time = 60  # Wait 60 seconds for rate limit reset
+                            logger.warning(f"Groq rate limit hit, waiting {wait_time}s (attempt {attempt + 1}/{retry_count})...")
+                            time.sleep(wait_time)
+                            continue
+                    
+                    logger.warning(f"Groq API failed: {str(e)}, trying fallback...")
+                    break  # Exit retry loop and try fallback
         
         # Fallback to Gemini
         if self.fallback_client:
