@@ -18,7 +18,7 @@ class Settings:
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
     HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN', '')
     
-    # News API Keys (Required: At least one)
+    # News API Keys (Required: At Least one)
     GUARDIAN_API_KEY = os.getenv('GUARDIAN_API_KEY', '')
     GNEWS_API_KEY = os.getenv('GNEWS_API_KEY', '')
     NEWSAPI_KEY = os.getenv('NEWSAPI_KEY', '')
@@ -60,10 +60,10 @@ class Settings:
     MIN_ARTICLE_WORDS = int(os.getenv('MIN_ARTICLE_WORDS') or '800')
     MAX_ARTICLE_WORDS = int(os.getenv('MAX_ARTICLE_WORDS') or '1500')
     
-    # AI Model Settings (Updated models)
+    # AI Model Settings (CORRECTED - Current working models)
     PRIMARY_AI = 'groq' if GROQ_API_KEY else 'gemini'
-    GROQ_MODEL = 'llama-3.1-70b-versatile'  # Updated Groq model
-    GEMINI_MODEL = 'gemini-1.5-flash-latest'  # Updated Gemini model
+    GROQ_MODEL = 'mixtral-8x7b-32768'  # Current free Groq model (stable)
+    GEMINI_MODEL = 'gemini-pro'  # Current free Gemini model (stable)
     
     # TTS Settings
     TTS_VOICE = 'en-US-AriaNeural'  # Microsoft Edge TTS voice
@@ -116,6 +116,8 @@ class Settings:
         print(f"Posts per run: {cls.POSTS_PER_RUN}")
         print(f"Language: {cls.BLOG_LANGUAGE}")
         print(f"AI Model: {cls.PRIMARY_AI}")
+        print(f"Groq Model: {cls.GROQ_MODEL}")
+        print(f"Gemini Model: {cls.GEMINI_MODEL}")
         print(f"Groq API: {'✓' if cls.GROQ_API_KEY else '✗'}")
         print(f"Gemini API: {'✓' if cls.GEMINI_API_KEY else '✗'}")
         print(f"Hashnode: {'✓' if cls.HASHNODE_API_KEY else '✗'}")
