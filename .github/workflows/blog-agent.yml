@@ -125,7 +125,7 @@ jobs:
       # Step 8: Upload logs as artifact (for debugging)
       - name: Upload Logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: blog-agent-logs-${{ github.run_number }}
           path: blog_agent.log
