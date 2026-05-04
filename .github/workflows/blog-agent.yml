@@ -1,0 +1,141 @@
+# Blog AI Agent - GitHub Actions Workflow
+# Runs automatically every 6 hours using GitHub's free servers
+# Completely free: 2000 minutes/month (our usage: ~1800 minutes/month)
+
+name: Blog AI Agent Automation
+
+# When to run the workflow
+on:
+  # Run every 6 hours (at 0:00, 6:00, 12:00, 18:00 UTC)
+  schedule:
+    - cron: '0 */6 * * *'
+  
+  # Allow manual trigger from GitHub Actions tab (for testing)
+  workflow_dispatch:
+
+# Environment variables available to all jobs
+env:
+  PYTHON_VERSION: '3.11'
+  # All secrets are passed as environment variables below
+
+jobs:
+  # Job name: run-blog-agent
+  run-blog-agent:
+    # Use GitHub's free Ubuntu server (latest version)
+    runs-on: ubuntu-latest
+    
+    # Timeout: Stop if run takes more than 15 minutes (stays within free tier)
+    timeout-minutes: 15
+    
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # Fetch full history to commit database changes
+          fetch-depth: 0
+      
+      # Step 2: Set up Python environment
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      # Step 3: Install Python dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        timeout-minutes: 5
+      
+      # Step 4: Configure Git for committing database changes
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      
+      # Step 5: Pull latest database (in case other runs updated it)
+      - name: Pull Latest Database
+        run: |
+          git pull origin main || echo "No changes to pull"
+        continue-on-error: true
+      
+      # Step 6: Run the Blog AI Agent
+      - name: Run Blog AI Agent
+        env:
+          # AI API Keys
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+          
+          # News APIs
+          GUARDIAN_API_KEY: ${{ secrets.GUARDIAN_API_KEY }}
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          
+          # Image APIs
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          
+          # Blog Platforms
+          HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
+          HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+          
+          # Social Media
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+          REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+          
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          
+          MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+          MASTODON_API_BASE_URL: ${{ secrets.MASTODON_API_BASE_URL }}
+          
+          # Settings
+          NICHE: ${{ secrets.NICHE }}
+          POSTS_PER_RUN: ${{ secrets.POSTS_PER_RUN }}
+          BLOG_LANGUAGE: ${{ secrets.BLOG_LANGUAGE }}
+          MIN_ARTICLE_WORDS: ${{ secrets.MIN_ARTICLE_WORDS }}
+          MAX_ARTICLE_WORDS: ${{ secrets.MAX_ARTICLE_WORDS }}
+        
+        run: |
+          python main.py
+        timeout-minutes: 12
+      
+      # Step 7: Commit and push database changes (if any)
+      - name: Commit Database Changes
+        run: |
+          git add database/blog_agent.db || echo "No database file"
+          git diff --staged --quiet || (git commit -m "Update database [skip ci]" && git push)
+        continue-on-error: true
+        if: always()
+      
+      # Step 8: Upload logs as artifact (for debugging)
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: blog-agent-logs-${{ github.run_number }}
+          path: blog_agent.log
+          retention-days: 7
+        continue-on-error: true
+
+# Free Tier Usage Calculation:
+# - Runs every 6 hours = 4 times/day
+# - 30 days/month = 120 runs/month
+# - Each run: ~15 minutes max
+# - Total: 120 × 15 = 1800 minutes/month
+# - GitHub free tier: 2000 minutes/month for private repos, unlimited for public repos
+# - We're using a PUBLIC repo, so it's completely FREE!

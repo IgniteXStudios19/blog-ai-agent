@@ -1,0 +1,47 @@
+# Environment variables (NEVER COMMIT THIS!)
+.env
+
+# Python virtual environment
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+
+# Database files
+database/*.db
+database/*.sqlite
+database/*.sqlite3
+
+# Output directories
+output/
+assets/temp/
+assets/audio/
+assets/video/
+assets/images/
+
+# Logs
+*.log
+logs/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+.pytest_cache/
+htmlcov/
+.coverage
