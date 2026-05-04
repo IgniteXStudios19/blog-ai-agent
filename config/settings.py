@@ -53,12 +53,12 @@ class Settings:
     MASTODON_ACCESS_TOKEN = os.getenv('MASTODON_ACCESS_TOKEN', '')
     MASTODON_API_BASE_URL = os.getenv('MASTODON_API_BASE_URL', 'https://mastodon.social')
     
-    # System Settings
+    # System Settings (handle empty strings properly)
     NICHE = os.getenv('NICHE', 'technology')  # Blog topic
-    POSTS_PER_RUN = int(os.getenv('POSTS_PER_RUN', '3'))  # Posts per 6-hour run
+    POSTS_PER_RUN = int(os.getenv('POSTS_PER_RUN') or '3')  # Posts per 6-hour run
     BLOG_LANGUAGE = os.getenv('BLOG_LANGUAGE', 'english')
-    MIN_ARTICLE_WORDS = int(os.getenv('MIN_ARTICLE_WORDS', '800'))
-    MAX_ARTICLE_WORDS = int(os.getenv('MAX_ARTICLE_WORDS', '1500'))
+    MIN_ARTICLE_WORDS = int(os.getenv('MIN_ARTICLE_WORDS') or '800')
+    MAX_ARTICLE_WORDS = int(os.getenv('MAX_ARTICLE_WORDS') or '1500')
     
     # AI Model Settings
     PRIMARY_AI = 'groq' if GROQ_API_KEY else 'gemini'
@@ -123,7 +123,6 @@ class Settings:
         print(f"Twitter: {'✓' if cls.TWITTER_API_KEY else '✗'}")
         print(f"Discord: {'✓' if cls.DISCORD_WEBHOOK_URL else '✗'}")
         print(f"Mastodon: {'✓' if cls.MASTODON_ACCESS_TOKEN else '✗'}")
-
 
 # Create a global settings instance
 settings = Settings()
