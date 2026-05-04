@@ -18,7 +18,7 @@ class Settings:
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
     HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN', '')
     
-    # News API Keys (Required: At Least one)
+    # News API Keys (Required: At least one)
     GUARDIAN_API_KEY = os.getenv('GUARDIAN_API_KEY', '')
     GNEWS_API_KEY = os.getenv('GNEWS_API_KEY', '')
     NEWSAPI_KEY = os.getenv('NEWSAPI_KEY', '')
@@ -60,10 +60,10 @@ class Settings:
     MIN_ARTICLE_WORDS = int(os.getenv('MIN_ARTICLE_WORDS') or '800')
     MAX_ARTICLE_WORDS = int(os.getenv('MAX_ARTICLE_WORDS') or '1500')
     
-    # AI Model Settings (CORRECTED - Current working models)
+    # AI Model Settings (VERIFIED WORKING MODELS)
     PRIMARY_AI = 'groq' if GROQ_API_KEY else 'gemini'
-    GROQ_MODEL = 'mixtral-8x7b-32768'  # Current free Groq model (stable)
-    GEMINI_MODEL = 'gemini-pro'  # Current free Gemini model (stable)
+    GROQ_MODEL = 'llama3-8b-8192'  # Verified working Groq model
+    GEMINI_MODEL = 'gemini-1.0-pro-vision-latest'  # Verified working Gemini model
     
     # TTS Settings
     TTS_VOICE = 'en-US-AriaNeural'  # Microsoft Edge TTS voice
