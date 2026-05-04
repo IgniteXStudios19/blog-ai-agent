@@ -28,47 +28,51 @@ jobs:
     timeout-minutes: 15
     
     steps:
-      # Step 1: Check out the repository code
+      # Step1: Check out the repository code
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           # Fetch full history to commit database changes
           fetch-depth: 0
       
-      # Step 2: Set up Python environment
+      # Step2: Set up Python environment
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       
-      # Step 3: Install System Dependencies (ImageMagick for video text overlays)
+      # Step3: Install System Dependencies (ImageMagick for video text overlays)
       - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick
           python -m pip install --upgrade pip
+          which convert || echo "ImageMagick convert not found"
       
-      # Step 4: Install Python dependencies
+      # Step4: Install Python dependencies
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
         timeout-minutes: 5
       
-      # Step 5: Configure Git for committing database changes
+      # Step5: Configure Git for committing database changes
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
       
-      # Step 6: Pull latest database (in case other runs updated it)
+      # Step6: Pull latest database (in case other runs updated it)
       - name: Pull Latest Database
         run: |
           git pull origin main || echo "No changes to pull"
         continue-on-error: true
       
-      # Step 7: Run the Blog AI Agent
+      # Step7: Run the Blog AI Agent
       - name: Run Blog AI Agent
         env:
+          # ImageMagick path for MoviePy video text overlays
+          IMAGEMAGICK_BINARY: /usr/bin/convert
+          
           # AI API Keys
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -120,7 +124,7 @@ jobs:
           python main.py
         timeout-minutes: 12
       
-      # Step 8: Commit and push database changes (if any)
+      # Step8: Commit and push database changes (if any)
       - name: Commit Database Changes
         run: |
           git add database/blog_agent.db || echo "No database file"
@@ -128,7 +132,7 @@ jobs:
         continue-on-error: true
         if: always()
       
-      # Step 9: Upload logs as artifact (for debugging)
+      # Step9: Upload logs as artifact (for debugging)
       - name: Upload Logs
         if: always()
         uses: actions/upload-artifact@v4

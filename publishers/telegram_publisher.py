@@ -3,6 +3,7 @@ Telegram Publisher - Sends messages, images, audio, video to Telegram channel
 Telegram is the BEST platform to start with: NO rate limits, completely free API
 """
 
+import os
 import requests
 from config.settings import settings
 from utils.logger import setup_logger
