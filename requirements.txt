@@ -1,6 +1,7 @@
 # RSS and News Processing
 feedparser==6.0.10          # RSS feed reading
 newspaper3k==0.2.8          # Article extraction from URLs
+lxml_html_clean==0.1.1       # Required by newspaper3k for HTML cleaning
 requests==2.31.0            # HTTP calls to APIs
 beautifulsoup4==4.12.2      # Web scraping HTML parsing
 

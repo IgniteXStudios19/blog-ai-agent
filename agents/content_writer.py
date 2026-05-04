@@ -98,7 +98,7 @@ class ContentWriter:
         text = full_article['text'] if full_article else news_item.get('summary', '')
         text = text[:3000]  # Limit to 3000 chars for API
         
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'RESEARCH_ANALYSIS',
             title=news_item['title'],
             text=text,
@@ -124,7 +124,7 @@ class ContentWriter:
         """Create blog post outline"""
         logger.info("Creating blog outline...")
         
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'BLOG_OUTLINE',
             summary=analysis.get('summary', ''),
             key_points='\n'.join(analysis.get('key_points', [])),
@@ -141,7 +141,7 @@ class ContentWriter:
         """Write full blog post"""
         logger.info("Writing full blog post...")
         
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'BLOG_WRITING',
             niche=settings.NICHE,
             outline=outline,
@@ -164,7 +164,7 @@ class ContentWriter:
         """Make AI content sound more human"""
         logger.info("Humanizing content...")
         
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'HUMANIZE_CONTENT',
             text=text[:3000]  # Limit for API
         )
@@ -176,7 +176,7 @@ class ContentWriter:
         """Generate SEO metadata"""
         logger.info("Generating SEO metadata...")
         
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'SEO_METADATA',
             title=analysis.get('main_topic', ''),
             summary=blog_post[:500],
@@ -206,7 +206,7 @@ class ContentWriter:
         
         word_count = len(text.split())
         
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'QUALITY_CHECK',
             text=text[:2000],
             min=settings.MIN_ARTICLE_WORDS,
@@ -261,7 +261,7 @@ class ContentWriter:
     
     def _generate_twitter_post(self, blog_data):
         """Generate Twitter/X post"""
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'TWITTER_POST',
             title=blog_data['title'],
             summary=blog_data['summary'],
@@ -272,7 +272,7 @@ class ContentWriter:
     
     def _generate_linkedin_post(self, blog_data):
         """Generate LinkedIn post"""
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'LINKEDIN_POST',
             title=blog_data['title'],
             summary=blog_data['summary'],
@@ -283,7 +283,7 @@ class ContentWriter:
     
     def _generate_reddit_post(self, blog_data):
         """Generate Reddit post"""
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'REDDIT_POST',
             title=blog_data['title'],
             summary=blog_data['summary'],
@@ -295,7 +295,7 @@ class ContentWriter:
     
     def _generate_telegram_post(self, blog_data):
         """Generate Telegram post"""
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'TELEGRAM_POST',
             title=blog_data['title'],
             summary=blog_data['summary'],
@@ -305,7 +305,7 @@ class ContentWriter:
     
     def _generate_discord_embed(self, blog_data):
         """Generate Discord embed"""
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'DISCORD_EMBED',
             title=blog_data['title'],
             summary=blog_data['summary'],
@@ -326,7 +326,7 @@ class ContentWriter:
     
     def _generate_mastodon_post(self, blog_data):
         """Generate Mastodon post"""
-        prompt = PromptTemplates.FORMAT_PROMPT(
+        prompt = PromptTemplates.format_prompt(
             'MASTODON_POST',
             title=blog_data['title'],
             summary=blog_data['summary'],
